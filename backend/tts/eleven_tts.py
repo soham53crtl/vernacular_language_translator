@@ -8,10 +8,10 @@ load_dotenv()  # 🔥 loads .env file
 API_KEY = os.getenv("ELEVEN_LABS_API_KEY")
 
 if not API_KEY:
-    raise ValueError("ElevenLabs API key missing")
-
-client = ElevenLabs(api_key=API_KEY)
-client = ElevenLabs(api_key=API_KEY)
+    print("[WARN] ELEVEN_LABS_API_KEY missing - TTS audio output will be disabled")
+    client = None
+else:
+    client = ElevenLabs(api_key=API_KEY)
 
 OUT_DIR = "tts/output"
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -24,6 +24,9 @@ def speak(text: str) -> bytes | None:
 
     if not text.strip():
         return None
+
+    if client is None:
+        raise RuntimeError("TTS unavailable: ELEVEN_LABS_API_KEY not configured")
 
     print("[ElevenLabs] Generating natural voice...")
 
